@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>TÉNÈBRES ÉTERNELLES — Trailer</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --blood: #8a0000;
+  --ember: #cc3300;
+  --bone: #c8b890;
+  --void: #000000;
+  --grey: #1a1008;
+}
+
+html, body {
+  width:100%; height:100%;
+  background:#000;
+  overflow:hidden;
+  cursor:none;
+  font-family:'Cinzel', serif;
+}
+
+/* ── CURSEUR CUSTOM ── */
+#cursor {
+  position:fixed; width:8px; height:8px;
+  background:#cc0000; border-radius:50%;
+  pointer-events:none; z-index:9999;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 12px #ff0000;
+  transition:transform 0.1s;
+}
+
+/* ── CONTAINER PRINCIPAL ── */
+#stage {
+  position:fixed; inset:0;
+  display:flex; align-items:center; justify-content:center;
+}
+
+/* ── COUCHES DE FOND ── */
+#bg-noise {
+  position:fixed; inset:0; z-index:0;
+  opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+  animation:noiseAnim 0.1s steps(1) infinite;
+}
+@keyframes noiseAnim {
+  0%{background-position:0 0}25%{background-position:-50px 20px}50%{background-position:30px -40px}75%{background-position:-20px 50px}
+}
+
+#vignette {
+  position:fixed; inset:0; z-index:1;
+  background:radial-gradient(ellipse 70% 70% at 50% 50%, transparent 30%, rgba(0,0,0,0.85) 100%);
+  pointer-events:none;
+}
+
+#scanlines {
+  position:fixed; inset:0; z-index:2;
+  background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  pointer-events:none; animation:scanMove 8s linear infinite;
+}
+@keyframes scanMove { from{background-position:0 0} to{background-position:0 100px} }
+
+/* ── SCENE SYSTEM ── */
+.scene {
+  position:fixed; inset:0; z-index:10;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  opacity:0; pointer-events:none;
+  transition:none;
+}
+.scene.active { opacity:1; pointer-events:all; }
+
+/* ── ECRAN INTRO ── */
+#scene-intro {
+  background:#000;
+  cursor:pointer; pointer-events:all !important; opacity:1 !important;
+}
+#intro-content {
+  text-align:center;
+  animation:introFadeIn 2s ease forwards;
+}
+@keyframes introFadeIn {
+  from{opacity:0;transform:scale(1.05)} to{opacity:1;transform:scale(1)}
+}
+#intro-logo {
+  font-size:clamp(40px,8vw,90px);
+  font-weight:900; letter-spacing:0.2em;
+  color:transparent;
+  background:linear-gradient(180deg, #cc0000 0%, #660000 50%, #220000 100%);
+  -webkit-background-clip:text; background-clip:text;
+  text-shadow:none;
+  filter:drop-shadow(0 0 30px rgba(200,0,0,0.5)) drop-shadow(0 0 80px rgba(100,0,0,0.3));
+  line-height:1; margin-bottom:16px;
+}
+#intro-sub {
+  font-family:'Crimson Text', serif;
+  font-size:clamp(12px,2vw,18px);
+  color:#440000; letter-spacing:0.5em;
+  text-transform:uppercase; margin-bottom:60px;
+}
+#intro-start {
+  font-size:13px; color:#331a0a; letter-spacing:0.4em;
+  text-transform:uppercase; animation:blink 2s ease infinite;
+}
+@keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:1} }
+#intro-warning {
+  position:absolute; bottom:30px; left:50%; transform:translateX(-50%);
+  font-family:'Crimson Text', serif; font-style:italic;
+  font-size:11px; color:#220000; letter-spacing:2px;
+  text-align:center; line-height:2;
+}
+
+/* ── GLITCH ── */
+#glitch-overlay {
+  position:fixed; inset:0; z-index:50;
+  pointer-events:none; opacity:0;
+  background:rgba(180,0,0,0.15);
+  mix-blend-mode:screen;
+}
+#glitch-overlay.flash { animation:glitchFlash 0.12s ease; }
+@keyframes glitchFlash {
+  0%{opacity:1;transform:translateX(-4px) skewX(-2deg)}
+  30%{opacity:0.8;transform:translateX(4px) skewX(2deg)}
+  60%{opacity:0.6;transform:translateX(-2px)}
+  100%{opacity:0}
+}
+
+/* ── FILM GRAIN ── */
+#grain {
+  position:fixed; inset:0; z-index:3;
+  opacity:0.06; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23g)'/%3E%3C/svg%3E");
+  animation:grainAnim 0.15s steps(2) infinite;
+}
+@keyframes grainAnim {
+  0%{transform:translate(0,0)} 25%{transform:translate(-5px,5px)} 50%{transform:translate(5px,-5px)} 75%{transform:translate(-5px,-5px)}
+}
+
+/* ── SCENES CHAPITRES ── */
+.chapter-scene {
+  background:#000;
+  overflow:hidden;
+}
+
+.scene-bg {
+  position:absolute; inset:0;
+  background-size:cover; background-position:center;
+}
+
+.scene-fog {
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse 60% 60% at 50% 80%, transparent 0%, rgba(0,0,0,0.95) 100%);
+}
+
+/* Chapitre 1 — Demeure */
+#scene-ch1 .scene-bg {
+  background:
+    radial-gradient(ellipse 40% 30% at 20% 40%, rgba(60,10,5,0.8) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 80% at 80% 60%, rgba(30,5,0,0.6) 0%, transparent 70%),
+    linear-gradient(180deg, #050002 0%, #0d0205 40%, #020001 100%);
+}
+/* Fenêtre avec lumière sanglante */
+#ch1-window {
+  position:absolute; right:20%; top:15%;
+  width:80px; height:140px;
+  background:linear-gradient(180deg, #660000 0%, #330000 60%, #110000 100%);
+  box-shadow:0 0 60px 30px rgba(100,0,0,0.4), 0 0 150px 60px rgba(60,0,0,0.2);
+  border:2px solid rgba(180,30,0,0.3);
+  animation:windowFlicker 3s ease infinite;
+}
+@keyframes windowFlicker {
+  0%,100%{opacity:0.8} 45%{opacity:0.6} 46%{opacity:1} 48%{opacity:0.5} 49%{opacity:0.9}
+}
+#ch1-window::before {
+  content:''; position:absolute; inset:0;
+  background:repeating-linear-gradient(90deg, rgba(0,0,0,0.5) 0px, rgba(0,0,0,0.5) 3px, transparent 3px, transparent 30px),
+             repeating-linear-gradient(0deg, rgba(0,0,0,0.5) 0px, rgba(0,0,0,0.5) 3px, transparent 3px, transparent 50px);
+}
+/* Silhouette dans la fenêtre */
+#ch1-silhouette {
+  position:absolute; right:calc(20% + 25px); top:20%;
+  width:30px; height:80px;
+  background:rgba(0,0,0,0.9);
+  clip-path:polygon(30% 0%, 70% 0%, 80% 15%, 100% 30%, 90% 60%, 100% 100%, 0% 100%, 10% 60%, 0% 30%, 20% 15%);
+  filter:blur(1px);
+  animation:silhouetteBreath 4s ease infinite;
+}
+@keyframes silhouetteBreath {
+  0%,100%{transform:scaleY(1) translateY(0)} 50%{transform:scaleY(0.96) translateY(3px)}
+}
+/* Sang qui coule sur le mur */
+.blood-drip {
+  position:absolute; width:3px; background:linear-gradient(180deg, #880000, #440000, transparent);
+  border-radius:2px; animation:drip linear infinite;
+}
+@keyframes drip { from{height:0;opacity:1} to{height:200px;opacity:0} }
+
+/* Chapitre 2 — Catacombes */
+#scene-ch2 .scene-bg {
+  background:
+    radial-gradient(circle 200px at 50% 60%, rgba(30,30,80,0.4) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 50% at 50% 100%, rgba(10,10,40,0.8) 0%, transparent 60%),
+    linear-gradient(180deg, #000 0%, #020208 50%, #000 100%);
+}
+/* Os / crâne */
+#ch2-skull {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-60%);
+  opacity:0.15; filter:blur(0.5px);
+}
+/* Bougie */
+.candle {
+  position:absolute; bottom:25%;
+  display:flex; flex-direction:column; align-items:center;
+}
+.candle-flame {
+  width:12px; height:20px;
+  background:radial-gradient(ellipse at 50% 100%, #ff8800 0%, #ff4400 40%, transparent 80%);
+  border-radius:50% 50% 30% 30%;
+  animation:candleFlicker 0.2s ease infinite alternate;
+  box-shadow:0 0 15px 5px rgba(255,100,0,0.3), 0 0 40px 15px rgba(200,50,0,0.15);
+}
+@keyframes candleFlicker {
+  0%{transform:scaleX(0.8) scaleY(1.1) rotate(-2deg)} 100%{transform:scaleX(1.2) scaleY(0.9) rotate(2deg)}
+}
+.candle-body { width:14px; height:60px; background:linear-gradient(90deg, #ddd0a0, #c8b888, #ddd0a0); }
+.candle-wax { position:absolute; top:-5px; left:50%; transform:translateX(-50%); width:18px; height:8px; background:#e8dfc0; border-radius:50%; }
+
+/* Inscriptions sur pierre */
+.rune-text {
+  position:absolute; font-family:'Cinzel',serif;
+  color:rgba(100,80,200,0.25); letter-spacing:0.3em; font-size:11px;
+  text-transform:uppercase; white-space:nowrap;
+  animation:runeGlow 3s ease infinite;
+}
+@keyframes runeGlow { 0%,100%{opacity:0.15} 50%{opacity:0.4;text-shadow:0 0 10px rgba(100,80,200,0.5)} }
+
+/* Chapitre 3 — Asile */
+#scene-ch3 .scene-bg {
+  background:
+    radial-gradient(ellipse 40% 60% at 30% 50%, rgba(0,40,10,0.3) 0%, transparent 60%),
+    repeating-linear-gradient(90deg, transparent 0px, transparent 38px, rgba(0,20,5,0.15) 38px, rgba(0,20,5,0.15) 40px),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 38px, rgba(0,20,5,0.12) 38px, rgba(0,20,5,0.12) 40px),
+    linear-gradient(180deg, #000 0%, #020a03 50%, #000 100%);
+}
+/* Carreaux fissurés */
+.tile-crack {
+  position:absolute; width:2px; background:rgba(0,80,20,0.2);
+  transform-origin:top;
+  animation:crackAppear 0.3s ease forwards;
+}
+/* Lumière fluorescente qui clignote */
+#ch3-light {
+  position:absolute; top:0; left:50%; transform:translateX(-50%);
+  width:80%; height:3px;
+  background:rgba(0,255,80,0.6);
+  box-shadow:0 0 20px 10px rgba(0,200,60,0.3), 0 0 60px 30px rgba(0,150,40,0.1);
+  animation:fluoroFlicker 0.08s steps(1) infinite;
+}
+@keyframes fluoroFlicker {
+  0%,15%,17%,70%,100%{opacity:0.9} 16%,71%,73%{opacity:0} 72%{opacity:0.4}
+}
+/* Mots sur les murs */
+.asylum-text {
+  position:absolute; font-family:'Crimson Text',serif; font-style:italic;
+  color:rgba(0,180,40,0.3); font-size:clamp(10px,1.5vw,16px);
+  letter-spacing:0.2em; animation:asylumTextGlow 4s ease infinite;
+}
+@keyframes asylumTextGlow { 0%,100%{opacity:0.2} 50%{opacity:0.5} }
+/* Docteur — silhouette */
+#ch3-doctor {
+  position:absolute; right:15%; bottom:20%;
+  opacity:0; animation:doctorAppear 1s ease 1.5s forwards;
+}
+@keyframes doctorAppear {
+  from{opacity:0;transform:translateX(30px)} to{opacity:0.4;transform:translateX(0)}
+}
+
+/* Chapitre 4 — Rituel */
+#scene-ch4 .scene-bg {
+  background:
+    radial-gradient(circle 300px at 50% 60%, rgba(150,0,0,0.25) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 50% at 50% 100%, rgba(80,0,0,0.6) 0%, transparent 60%),
+    linear-gradient(180deg, #000 0%, #0a0000 50%, #000 100%);
+}
+/* Pentagramme */
+#pentagram {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+  width:min(400px,60vw); height:min(400px,60vw);
+  animation:pentaRotate 20s linear infinite;
+  opacity:0.25;
+}
+@keyframes pentaRotate { from{transform:translate(-50%,-50%) rotate(0deg)} to{transform:translate(-50%,-50%) rotate(360deg)} }
+/* Feu */
+.fire-particle {
+  position:absolute; border-radius:50% 50% 30% 30%;
+  animation:fireRise linear infinite;
+  pointer-events:none;
+}
+@keyframes fireRise {
+  0%{transform:translateY(0) scaleX(1);opacity:1}
+  100%{transform:translateY(-120px) scaleX(0.3);opacity:0}
+}
+/* Démon silhouette */
+#demon-silhouette {
+  position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:clamp(120px,25vw,280px);
+  opacity:0; animation:demonRise 2s ease 1s forwards;
+  filter:drop-shadow(0 0 30px rgba(255,50,0,0.5));
+}
+@keyframes demonRise {
+  from{opacity:0;transform:translateX(-50%) translateY(50px) scale(0.8)}
+  to{opacity:0.7;transform:translateX(-50%) translateY(0) scale(1)}
+}
+
+/* ── TEXTE DES SCENES ── */
+.scene-text-wrap {
+  position:absolute; inset:0; z-index:20;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  pointer-events:none;
+}
+
+.chapter-label {
+  font-size:clamp(9px,1.2vw,12px);
+  color:var(--blood); letter-spacing:0.6em;
+  text-transform:uppercase; margin-bottom:16px;
+  animation:labelIn 0.8s ease both;
+}
+@keyframes labelIn { from{opacity:0;letter-spacing:1em} to{opacity:1;letter-spacing:0.6em} }
+
+.chapter-title-text {
+  font-size:clamp(28px,5vw,64px);
+  font-weight:900; color:#fff;
+  letter-spacing:0.1em; text-transform:uppercase;
+  text-shadow:0 0 40px rgba(200,0,0,0.5), 0 0 80px rgba(100,0,0,0.3);
+  animation:titleIn 1s ease 0.3s both;
+  line-height:1.1;
+}
+@keyframes titleIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+.chapter-quote {
+  font-family:'Crimson Text', serif; font-style:italic;
+  font-size:clamp(14px,2vw,22px);
+  color:rgba(180,120,80,0.7); margin-top:20px;
+  animation:quoteIn 1s ease 0.8s both;
+  max-width:600px; text-align:center; line-height:1.6;
+}
+@keyframes quoteIn { from{opacity:0} to{opacity:1} }
+
+/* Barre de progression chapitre en bas */
+.chapter-num-display {
+  position:absolute; bottom:40px; left:50%; transform:translateX(-50%);
+  font-size:10px; color:#330000; letter-spacing:4px; text-transform:uppercase;
+  animation:numIn 0.5s ease 1s both;
+}
+@keyframes numIn { from{opacity:0} to{opacity:1} }
+
+/* ── SCENE FINALE ── */
+#scene-final {
+  background:#000;
+}
+#final-bg {
+  position:absolute; inset:0;
+  background:radial-gradient(circle 500px at 50% 50%, rgba(80,0,0,0.4) 0%, transparent 70%);
+  animation:finalPulse 3s ease infinite;
+}
+@keyframes finalPulse { 0%,100%{opacity:0.5} 50%{opacity:1} }
+
+#final-title {
+  font-size:clamp(40px,10vw,110px);
+  font-weight:900; color:transparent;
+  background:linear-gradient(180deg, #fff 0%, #cc0000 40%, #440000 100%);
+  -webkit-background-clip:text; background-clip:text;
+  letter-spacing:0.15em; text-transform:uppercase;
+  text-align:center; line-height:0.9;
+  filter:drop-shadow(0 0 40px rgba(200,0,0,0.6));
+  animation:finalTitleIn 1.5s ease both;
+}
+@keyframes finalTitleIn { from{opacity:0;transform:scale(1.1)} to{opacity:1;transform:scale(1)} }
+
+#final-sub {
+  font-family:'Crimson Text', serif; font-style:italic;
+  font-size:clamp(14px,2.5vw,26px);
+  color:rgba(180,100,60,0.8); letter-spacing:0.3em;
+  margin-top:20px; animation:finalSubIn 1s ease 0.8s both;
+}
+@keyframes finalSubIn { from{opacity:0} to{opacity:1} }
+
+#final-cta {
+  margin-top:50px;
+  font-size:clamp(10px,1.5vw,13px);
+  color:#441a0a; letter-spacing:0.5em;
+  text-transform:uppercase;
+  animation:ctaIn 1s ease 1.5s both, ctaBlink 2s ease 2.5s infinite;
+  border:1px solid #330000;
+  padding:14px 32px;
+  cursor:pointer; pointer-events:all;
+  transition:all 0.3s;
+}
+#final-cta:hover { color:#aa3300; border-color:#aa3300; box-shadow:0 0 20px rgba(150,40,0,0.3); }
+@keyframes ctaIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+@keyframes ctaBlink { 0%,100%{opacity:1} 50%{opacity:0.6} }
+
+/* ── BARRE DE PROGRESSION ── */
+#progress-bar {
+  position:fixed; bottom:0; left:0; z-index:100;
+  height:2px; background:var(--blood);
+  width:0%; transition:none;
+  box-shadow:0 0 8px rgba(180,0,0,0.6);
+}
+
+/* ── CHAPITRES NAV ── */
+#chapter-nav {
+  position:fixed; bottom:20px; left:50%; transform:translateX(-50%);
+  z-index:100; display:flex; gap:12px; opacity:0;
+  transition:opacity 0.5s;
+}
+#chapter-nav.visible { opacity:1; }
+.nav-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:#220000; cursor:pointer;
+  transition:all 0.3s; border:1px solid #440000;
+}
+.nav-dot.active { background:#cc0000; box-shadow:0 0 8px rgba(200,0,0,0.5); }
+
+/* ── TITRE EN COURS (EN-TETE) ── */
+#now-playing {
+  position:fixed; top:24px; left:50%; transform:translateX(-50%);
+  z-index:100; font-size:10px; color:#220000; letter-spacing:4px;
+  text-transform:uppercase; opacity:0; transition:opacity 0.5s;
+}
+#now-playing.visible { opacity:1; }
+
+/* ── TRANSITIONS ── */
+#transition-wipe {
+  position:fixed; inset:0; z-index:80;
+  background:#000; transform:scaleX(0); transform-origin:left;
+  pointer-events:none;
+}
+#transition-wipe.wipe-in { animation:wipeIn 0.3s ease forwards; }
+#transition-wipe.wipe-out { animation:wipeOut 0.3s ease forwards; }
+@keyframes wipeIn { from{transform:scaleX(0);transform-origin:left} to{transform:scaleX(1);transform-origin:left} }
+@keyframes wipeOut { from{transform:scaleX(1);transform-origin:right} to{transform:scaleX(0);transform-origin:right} }
+
+/* ── TEXTE IMPACTANT AU CENTRE ── */
+#impact-text {
+  position:fixed; inset:0; z-index:70;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none; opacity:0;
+}
+#impact-text span {
+  font-size:clamp(40px,12vw,140px);
+  font-weight:900; color:#fff;
+  letter-spacing:0.3em; text-transform:uppercase;
+  text-shadow:0 0 60px rgba(255,0,0,0.8);
+  animation:none;
+}
+#impact-text.show { animation:impactShow 0.6s ease forwards; }
+@keyframes impactShow {
+  0%{opacity:0;transform:scale(1.4)} 20%{opacity:1;transform:scale(1)} 80%{opacity:1} 100%{opacity:0;transform:scale(0.95)}
+}
+
+/* ── SONS LABEL ── */
+#audio-label {
+  position:fixed; top:20px; right:20px; z-index:200;
+  font-size:9px; color:#330000; letter-spacing:3px;
+  opacity:0.6;
+}
+</style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="bg-noise"></div>
+<div id="vignette"></div>
+<div id="scanlines"></div>
+<div id="grain"></div>
+<div id="glitch-overlay"></div>
+<div id="transition-wipe"></div>
+<div id="impact-text"><span id="impact-word"></span></div>
+<div id="progress-bar"></div>
+<div id="chapter-nav"></div>
+<div id="now-playing">TÉNÈBRES ÉTERNELLES</div>
+<div id="audio-label">♪ AUDIO ON</div>
+
+<!-- SCÈNE INTRO -->
+<div class="scene" id="scene-intro">
+  <div id="intro-content">
+    <div id="intro-logo">TÉNÈBRES<br>ÉTERNELLES</div>
+    <div id="intro-sub">◆ &nbsp; Un jeu d'horreur &nbsp; ◆</div>
+    <div id="intro-start">[ CLIQUER POUR COMMENCER ]</div>
+  </div>
+  <div id="intro-warning">
+    Avertissement : contenu d'horreur.<br>
+    Casque recommandé.
+  </div>
+</div>
+
+<!-- SCÈNE CH1 — LA DEMEURE -->
+<div class="scene chapter-scene" id="scene-ch1">
+  <div class="scene-bg"></div>
+  <div id="ch1-window"></div>
+  <div id="ch1-silhouette"></div>
+  <div class="scene-fog"></div>
+  <div class="scene-text-wrap">
+    <div class="chapter-label">Chapitre I</div>
+    <div class="chapter-title-text">La Demeure<br>Maudite</div>
+    <div class="chapter-quote">« Quelque chose vous attend<br>dans les couloirs. »</div>
+  </div>
+  <div class="chapter-num-display">I / IV</div>
+</div>
+
+<!-- SCÈNE CH2 — CATACOMBES -->
+<div class="scene chapter-scene" id="scene-ch2">
+  <div class="scene-bg"></div>
+  <div class="scene-fog"></div>
+  <!-- Bougies -->
+  <div class="candle" style="left:20%">
+    <div class="candle-wax"></div>
+    <div class="candle-flame"></div>
+    <div class="candle-body"></div>
+  </div>
+  <div class="candle" style="left:75%">
+    <div class="candle-wax"></div>
+    <div class="candle-flame" style="animation-delay:-0.1s"></div>
+    <div class="candle-body" style="height:40px"></div>
+  </div>
+  <!-- Inscriptions -->
+  <div class="rune-text" style="top:30%;left:10%">MORITURI TE SALUTANT</div>
+  <div class="rune-text" style="top:55%;right:8%;animation-delay:-1s">IN TENEBRIS VERITAS</div>
+  <svg id="ch2-skull" width="200" height="180" viewBox="0 0 200 180">
+    <ellipse cx="100" cy="85" rx="75" ry="80" fill="#b0a070" stroke="#8a7850" stroke-width="2"/>
+    <ellipse cx="72" cy="72" rx="22" ry="24" fill="#0a0806"/>
+    <ellipse cx="128" cy="72" rx="22" ry="24" fill="#0a0806"/>
+    <rect x="82" y="145" width="12" height="20" rx="3" fill="#b0a070" stroke="#8a7850"/>
+    <rect x="97" y="145" width="12" height="20" rx="3" fill="#b0a070" stroke="#8a7850"/>
+    <rect x="112" y="145" width="10" height="18" rx="3" fill="#b0a070" stroke="#8a7850"/>
+    <path d="M75 120 Q100 135 125 120" stroke="#8a7850" stroke-width="2" fill="none"/>
+    <path d="M60 85 Q55 100 62 110" stroke="#7a6840" stroke-width="1.5" fill="none"/>
+    <path d="M140 82 Q148 98 140 108" stroke="#7a6840" stroke-width="1.5" fill="none"/>
+  </svg>
+  <div class="scene-text-wrap">
+    <div class="chapter-label">Chapitre II</div>
+    <div class="chapter-title-text">Les Catacombes<br>Oubliées</div>
+    <div class="chapter-quote">« Les morts ici ne reposent pas. »</div>
+  </div>
+  <div class="chapter-num-display">II / IV</div>
+</div>
+
+<!-- SCÈNE CH3 — ASILE -->
+<div class="scene chapter-scene" id="scene-ch3">
+  <div class="scene-bg"></div>
+  <div id="ch3-light"></div>
+  <div class="scene-fog"></div>
+  <div class="asylum-text" style="top:20%;left:8%;transform:rotate(-2deg)">AIDEZ-MOI</div>
+  <div class="asylum-text" style="top:35%;right:10%;animation-delay:-2s;transform:rotate(1deg)">IL EST DANS LES MURS</div>
+  <div class="asylum-text" style="bottom:30%;left:15%;animation-delay:-1s;transform:rotate(-1deg)">NE PAS DORMIR</div>
+  <!-- Docteur stylisé -->
+  <div id="ch3-doctor">
+    <svg width="80" height="200" viewBox="0 0 80 200">
+      <ellipse cx="40" cy="25" rx="18" ry="22" fill="#1a2a1a"/>
+      <rect x="20" y="45" width="40" height="90" rx="4" fill="#ddd8d0" opacity="0.8"/>
+      <line x1="40" y1="45" x2="40" y2="135" stroke="#aaa" stroke-width="1" opacity="0.4"/>
+      <rect x="10" y="50" width="12" height="70" rx="4" fill="#ccc8c0" opacity="0.7"/>
+      <rect x="58" y="50" width="12" height="70" rx="4" fill="#ccc8c0" opacity="0.7"/>
+      <rect x="24" y="135" width="14" height="55" rx="3" fill="#1a1822"/>
+      <rect x="42" y="135" width="14" height="55" rx="3" fill="#1a1822"/>
+      <!-- Tache sang -->
+      <ellipse cx="35" cy="85" rx="8" ry="4" fill="rgba(150,0,0,0.6)"/>
+      <ellipse cx="45" cy="100" rx="5" ry="3" fill="rgba(120,0,0,0.5)"/>
+    </svg>
+  </div>
+  <div class="scene-text-wrap">
+    <div class="chapter-label">Chapitre III</div>
+    <div class="chapter-title-text">L'Asile<br>des Âmes</div>
+    <div class="chapter-quote">« Les dossiers révèlent<br>ce que les murs ont absorbé. »</div>
+  </div>
+  <div class="chapter-num-display">III / IV</div>
+</div>
+
+<!-- SCÈNE CH4 — RITUEL -->
+<div class="scene chapter-scene" id="scene-ch4">
+  <div class="scene-bg"></div>
+  <div class="scene-fog"></div>
+  <!-- Pentagramme SVG -->
+  <svg id="pentagram" viewBox="0 0 400 400">
+    <defs>
+      <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    <circle cx="200" cy="200" r="180" fill="none" stroke="rgba(180,0,0,0.5)" stroke-width="1.5"/>
+    <circle cx="200" cy="200" r="160" fill="none" stroke="rgba(150,0,0,0.3)" stroke-width="0.5"/>
+    <polygon points="200,30 367,280 53,160 347,160 33,280" fill="none" stroke="rgba(200,0,0,0.6)" stroke-width="2" filter="url(#glow)"/>
+    <!-- Runes autour -->
+    <text x="200" y="18" text-anchor="middle" font-family="Cinzel" font-size="10" fill="rgba(180,0,0,0.5)">⛧</text>
+    <text x="382" y="288" text-anchor="middle" font-family="Cinzel" font-size="10" fill="rgba(180,0,0,0.5)">⛧</text>
+    <text x="18" y="288" text-anchor="middle" font-family="Cinzel" font-size="10" fill="rgba(180,0,0,0.5)">⛧</text>
+  </svg>
+  <!-- Feu de sol -->
+  <div id="fire-container" style="position:absolute;bottom:20%;left:50%;transform:translateX(-50%);width:200px;height:80px"></div>
+  <!-- Démon SVG -->
+  <svg id="demon-silhouette" viewBox="0 0 280 320">
+    <!-- Corps -->
+    <ellipse cx="140" cy="200" rx="60" ry="80" fill="#0a0000"/>
+    <!-- Tête -->
+    <ellipse cx="140" cy="110" rx="40" ry="45" fill="#0d0000"/>
+    <!-- Cornes -->
+    <path d="M110 85 Q90 40 100 20 Q115 50 120 75" fill="#050000"/>
+    <path d="M170 85 Q190 40 180 20 Q165 50 160 75" fill="#050000"/>
+    <!-- Yeux -->
+    <ellipse cx="125" cy="108" rx="10" ry="10" fill="#ff3300" opacity="0.9"/>
+    <ellipse cx="155" cy="108" rx="10" ry="10" fill="#ff3300" opacity="0.9"/>
+    <ellipse cx="125" cy="108" rx="4" ry="8" fill="#000"/>
+    <ellipse cx="155" cy="108" rx="4" ry="8" fill="#000"/>
+    <!-- Ailes -->
+    <path d="M85 170 Q30 120 10 200 Q50 180 90 200" fill="#080000" opacity="0.9"/>
+    <path d="M195 170 Q250 120 270 200 Q230 180 190 200" fill="#080000" opacity="0.9"/>
+    <!-- Bras avec griffes -->
+    <path d="M85 190 Q50 210 40 240 L55 230 L45 255 L60 240 L55 260 L70 245" fill="#0a0000" stroke="#1a0000" stroke-width="0.5"/>
+    <path d="M195 190 Q230 210 240 240 L225 230 L235 255 L220 240 L225 260 L210 245" fill="#0a0000" stroke="#1a0000" stroke-width="0.5"/>
+    <!-- Lueur yeux -->
+    <ellipse cx="125" cy="108" rx="14" ry="14" fill="rgba(255,50,0,0.2)" filter="url(#glow)"/>
+    <ellipse cx="155" cy="108" rx="14" ry="14" fill="rgba(255,50,0,0.2)" filter="url(#glow)"/>
+  </svg>
+  <div class="scene-text-wrap">
+    <div class="chapter-label">Chapitre IV</div>
+    <div class="chapter-title-text">Le Rituel<br>Final</div>
+    <div class="chapter-quote">« Ce qui a été invoqué<br>ne peut être renvoyé. »</div>
+  </div>
+  <div class="chapter-num-display">IV / IV</div>
+</div>
+
+<!-- SCÈNE FINALE -->
+<div class="scene" id="scene-final">
+  <div id="final-bg"></div>
+  <div style="text-align:center;position:relative;z-index:10">
+    <div id="final-title">TÉNÈBRES<br>ÉTERNELLES</div>
+    <div id="final-sub">Quatre chapitres. Une seule vérité.</div>
+    <div id="final-cta" onclick="restartTrailer()">↩ &nbsp; REVOIR LE TRAILER</div>
+  </div>
+</div>
+
+<script>
+// ── CURSEUR ──
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top  = e.clientY + 'px';
+});
+
+// ── AUDIO WEB ──
+let audioCtx = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playDrone(freq=55, dur=4, vol=0.08) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 200;
+  osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+  osc.type = 'sawtooth'; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 0.5);
+  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
+  osc.start(); osc.stop(audioCtx.currentTime + dur + 0.1);
+}
+
+function playBoom(vol=0.3) {
+  if (!audioCtx) return;
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * 1.5, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) {
+    data[i] = (Math.random()*2-1) * Math.exp(-i / (audioCtx.sampleRate * 0.3));
+  }
+  const src = audioCtx.createBufferSource();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 150;
+  src.buffer = buf;
+  src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  src.start();
+}
+
+function playChime(freq=440, vol=0.15) {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.type = 'sine'; osc.frequency.value = freq;
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+  osc.start(); osc.stop(audioCtx.currentTime + 2.1);
+}
+
+function playHeartbeat() {
+  if (!audioCtx) return;
+  const beat = (t) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'sine'; osc.frequency.value = 80;
+    gain.gain.setValueAtTime(0.2, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.2);
+    osc.start(t); osc.stop(t + 0.3);
+    // Deuxième battement
+    const osc2 = audioCtx.createOscillator();
+    const gain2 = audioCtx.createGain();
+    osc2.connect(gain2); gain2.connect(audioCtx.destination);
+    osc2.type = 'sine'; osc2.frequency.value = 65;
+    gain2.gain.setValueAtTime(0.15, t + 0.15);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+    osc2.start(t + 0.15); osc2.stop(t + 0.5);
+  };
+  beat(audioCtx.currentTime);
+  beat(audioCtx.currentTime + 0.5);
+}
+
+function playStatic(vol=0.05, dur=0.3) {
+  if (!audioCtx) return;
+  const buf = audioCtx.createBuffer(1, audioCtx.sampleRate * dur, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = (Math.random()*2-1);
+  const src = audioCtx.createBufferSource();
+  const gain = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'highpass'; filter.frequency.value = 2000;
+  src.buffer = buf;
+  src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+  gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + dur);
+  src.start();
+}
+
+function playScream(vol=0.12) {
+  if (!audioCtx) return;
+  const freqs = [220, 330, 440, 550, 880];
+  freqs.forEach((f, i) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const dist = audioCtx.createWaveShaper();
+    const curve = new Float32Array(256);
+    for (let j = 0; j < 256; j++) {
+      const x = (j*2/256)-1;
+      curve[j] = (Math.PI + 200)*x / (Math.PI + 200*Math.abs(x));
+    }
+    dist.curve = curve;
+    osc.connect(dist); dist.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(f + Math.random()*20, audioCtx.currentTime);
+    osc.frequency.linearRampToValueAtTime(f*1.5, audioCtx.currentTime + 0.8);
+    gain.gain.setValueAtTime(vol/(i+1), audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1.2);
+    osc.start(); osc.stop(audioCtx.currentTime + 1.3);
+  });
+}
+
+// ── SCÈNES ──
+const SCENES = [
+  'scene-intro',
+  'scene-ch1',
+  'scene-ch2',
+  'scene-ch3',
+  'scene-ch4',
+  'scene-final'
+];
+
+const SCENE_DURATIONS = [0, 6000, 6000, 6000, 6000, 0]; // 0 = manuel
+const SCENE_IMPACTS = [null, 'OBSCURITÉ', 'MORT', 'FOLIE', 'DÉMON', null];
+
+let currentScene = 0;
+let sceneTimer = null;
+let isTransitioning = false;
+
+function showScene(idx, fromStart=false) {
+  if (isTransitioning && !fromStart) return;
+  isTransitioning = true;
+
+  const wipe = document.getElementById('transition-wipe');
+
+  // Wipe in
+  wipe.className = 'wipe-in';
+  setTimeout(() => {
+    // Changer de scène
+    document.querySelectorAll('.scene').forEach(s => s.classList.remove('active'));
+    document.getElementById(SCENES[idx]).classList.add('active');
+    currentScene = idx;
+
+    // Mettre à jour nav
+    document.querySelectorAll('.nav-dot').forEach((d,i) => {
+      d.classList.toggle('active', i === idx - 1);
+    });
+
+    // Progress bar
+    const pct = idx / (SCENES.length - 1) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+
+    // Son de transition
+    if (idx > 0 && idx < SCENES.length - 1) {
+      playBoom(0.25);
+      setTimeout(() => playDrone([55,65,80,90][idx-1] || 55, 5), 300);
+    }
+
+    // Wipe out
+    wipe.className = 'wipe-out';
+    setTimeout(() => {
+      isTransitioning = false;
+      wipe.className = '';
+
+      // Impact text
+      if (idx > 0 && idx < SCENES.length - 1 && SCENE_IMPACTS[idx]) {
+        showImpact(SCENE_IMPACTS[idx]);
+      }
+
+      // Audio spécial par scène
+      if (idx === 1) { playHeartbeat(); }
+      if (idx === 2) { playChime(220, 0.1); }
+      if (idx === 3) { playStatic(0.08, 0.5); }
+      if (idx === 4) { playScream(0.08); }
+      if (idx === 5) { playChime(110, 0.12); setTimeout(() => playChime(165, 0.08), 500); }
+
+      // Particules feu sur ch4
+      if (idx === 4) spawnFireParticles();
+
+      // Timer suivante
+      if (sceneTimer) clearTimeout(sceneTimer);
+      if (SCENE_DURATIONS[idx] > 0) {
+        sceneTimer = setTimeout(() => nextScene(), SCENE_DURATIONS[idx]);
+      }
+    }, 300);
+  }, 300);
+}
+
+function nextScene() {
+  if (currentScene < SCENES.length - 1) {
+    showScene(currentScene + 1);
+  }
+}
+
+function showImpact(word) {
+  const el = document.getElementById('impact-text');
+  document.getElementById('impact-word').textContent = word;
+  el.classList.add('show');
+  setTimeout(() => { el.classList.remove('show'); }, 600);
+  playStatic(0.04, 0.1);
+  glitch();
+}
+
+function glitch() {
+  const el = document.getElementById('glitch-overlay');
+  el.classList.add('flash');
+  setTimeout(() => el.classList.remove('flash'), 150);
+}
+
+// ── PARTICULES FEU ──
+function spawnFireParticles() {
+  const container = document.getElementById('fire-container');
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'fire-particle';
+    const size = 8 + Math.random() * 16;
+    const hue = 10 + Math.random() * 30;
+    p.style.cssText = `
+      width:${size}px; height:${size*1.5}px;
+      left:${Math.random()*180}px;
+      bottom:${Math.random()*20}px;
+      background:radial-gradient(ellipse at 50% 100%, hsl(${hue},100%,60%) 0%, hsl(${hue-10},100%,40%) 50%, transparent 80%);
+      animation-duration:${0.6+Math.random()*0.8}s;
+      animation-delay:${Math.random()*0.5}s;
+      opacity:${0.6+Math.random()*0.4};
+    `;
+    container.appendChild(p);
+  }
+}
+
+// ── GOUTTELETTES DE SANG CH1 ──
+function spawnBloodDrips() {
+  const scene = document.getElementById('scene-ch1');
+  for (let i = 0; i < 8; i++) {
+    const d = document.createElement('div');
+    d.className = 'blood-drip';
+    d.style.cssText = `
+      left:${Math.random()*100}%;
+      top:0;
+      animation-duration:${3+Math.random()*4}s;
+      animation-delay:${Math.random()*5}s;
+      opacity:${0.4+Math.random()*0.4};
+      width:${1+Math.random()*2}px;
+    `;
+    scene.appendChild(d);
+  }
+}
+
+// ── NAV DOTS ──
+function buildNav() {
+  const nav = document.getElementById('chapter-nav');
+  nav.innerHTML = '';
+  for (let i = 1; i <= 4; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'nav-dot';
+    dot.onclick = () => showScene(i);
+    dot.title = ['La Demeure','Les Catacombes',"L'Asile",'Le Rituel'][i-1];
+    nav.appendChild(dot);
+  }
+}
+
+// ── CLAVIER ──
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') nextScene();
+  if (e.key === 'ArrowLeft' && currentScene > 1) showScene(currentScene - 1);
+  if (e.key >= '1' && e.key <= '4') showScene(parseInt(e.key));
+  if (e.key === 'Escape') showScene(0);
+});
+
+// ── SWIPE MOBILE ──
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 50) { dx < 0 ? nextScene() : (currentScene > 1 && showScene(currentScene - 1)); }
+});
+
+// ── CLICK AVANCE ──
+document.addEventListener('click', e => {
+  if (currentScene === 0) {
+    initAudio();
+    document.getElementById('chapter-nav').classList.add('visible');
+    document.getElementById('now-playing').classList.add('visible');
+    spawnBloodDrips();
+    buildNav();
+    showScene(1, true);
+  } else if (currentScene > 0 && currentScene < SCENES.length - 1) {
+    if (e.target.id !== 'final-cta') nextScene();
+  }
+});
+
+function restartTrailer() {
+  if (sceneTimer) clearTimeout(sceneTimer);
+  showScene(1);
+}
+
+// Init : montrer intro
+document.getElementById('scene-intro').classList.add('active');
+
+// Glitch aléatoire
+setInterval(() => {
+  if (currentScene > 0 && currentScene < 5 && Math.random() < 0.15) glitch();
+}, 3000);
+
+// Drip de sang périodique sur ch1
+setInterval(() => {
+  if (currentScene === 1) {
+    const drips = document.querySelectorAll('#scene-ch1 .blood-drip');
+    if (drips.length < 15) spawnBloodDrips();
+  }
+}, 5000);
+</script>
+</body>
+</html>
